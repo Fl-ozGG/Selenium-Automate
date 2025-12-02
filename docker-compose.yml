@@ -1,4 +1,3 @@
-
 services:
   selenium-hub:
     image: selenium/hub:4.13.0
@@ -28,9 +27,8 @@ services:
     networks:
       - selenium-network
     ports:
-      - "5900:5900"
+      - "5902:5900"
     shm_size: "2g"
-    
 
   firefox-node:
     image: selenium/node-firefox:4.13.0

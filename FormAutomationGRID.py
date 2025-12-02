@@ -5,7 +5,7 @@ from selenium.webdriver.firefox.options import Options as FirefoxOptions
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-
+import time
 
 GRID_URL = "http://localhost:4444/wd/hub"
 WEB_URL  = "https://formy-project.herokuapp.com/form"
@@ -49,9 +49,11 @@ def test(driver):
     
     datepicker = driver.find_element(By.ID, "datepicker")
     datepicker.clear()
+    time.sleep(10)
     datepicker.send_keys("12/25/2025")
     
     submit = driver.find_element(By.LINK_TEXT, "Submit")
+    
     submit.click()
     
     wait = WebDriverWait(driver, 30)
@@ -73,12 +75,12 @@ def  get_driver(browser: str):
         case "chrome":
             opts = ChromeOptions()
             opts.add_argument("--disable-gpu")
-            opts.add_argument("--window-size=1920,1080")            
+            opts.add_argument("--window-size=1280,1000")            
             opts.headless = False            
         case "firefox":
             opts = FirefoxOptions()
-            opts.add_argument("--width=1920")
-            opts.add_argument("--height=1080")
+            opts.add_argument("--disable-gpu")
+            opts.add_argument("--window-size=1280,1000")  
             opts.headless = False            
         case _:
             raise ValueError("Invalid Browser")
