@@ -1,6 +1,4 @@
-networks:
-  selenium-network:
-    external: true
+
 services:
   selenium-hub:
     image: selenium/hub:4.13.0
@@ -15,40 +13,43 @@ services:
       timeout: 5s
       retries: 12
 
-  chrome:
+  chrome-node:
     image: selenium/node-chrome:4.13.0
     container_name: chrome-node
     depends_on:
       selenium-hub:
         condition: service_healthy
-    networks:
-      - selenium-network
     environment:
       - SE_EVENT_BUS_HOST=selenium-hub
       - SE_EVENT_BUS_PUBLISH_PORT=4442
       - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
       - SE_NODE_MAX_SESSIONS=5
       - SE_NODE_OVERRIDE_MAX_SESSIONS=true
-    shm_size: "2g"
-    # Optional VNC for visual debugging
+    networks:
+      - selenium-network
     ports:
       - "5900:5900"
+    shm_size: "2g"
+    
 
-  firefox:
+  firefox-node:
     image: selenium/node-firefox:4.13.0
     container_name: firefox-node
     depends_on:
       selenium-hub:
         condition: service_healthy
-    networks:
-      - selenium-network
     environment:
       - SE_EVENT_BUS_HOST=selenium-hub
       - SE_EVENT_BUS_PUBLISH_PORT=4442
       - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
       - SE_NODE_MAX_SESSIONS=5
       - SE_NODE_OVERRIDE_MAX_SESSIONS=true
-    shm_size: "2g"
-    # Optional VNC for visual debugging
+    networks:
+      - selenium-network
     ports:
       - "5901:5900"
+    shm_size: "2g"
+
+networks:
+  selenium-network:
+    driver: bridge
