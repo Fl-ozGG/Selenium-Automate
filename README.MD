@@ -1,58 +1,92 @@
-# Selenium Form Automation
+## 🚀 Selenium Grid-Powered Form Automation
 
-This project automates the workflow of a web form available at [Formy Project](https://formy-project.herokuapp.com/form).
+This project provides a robust, containerized solution for automating the submission of a sample web form using **Selenium Grid**. By leveraging Docker, we ensure consistent and parallel testing across multiple browser environments.
 
-The form includes multiple input types such as:
+The target form, hosted at [Formy Project](https://formy-project.herokuapp.com/form), showcases various common web elements:
 
-- Text fields  
-- Dropdown selects  
-- Date pickers  
-- Checkboxes  
+  * **Text Fields:** First Name, Last Name, Job Title
+  * **Radio Buttons:** Education Level (e.g., Grad School)
+  * **Checkboxes:** Gender (e.g., Male)
+  * **Dropdown Selects:** Years of Experience
+  * **Date Pickers**
 
-Once the form is filled and submitted:
+Upon successful execution, the script fills out all fields, submits the form, and asserts the successful confirmation message on [the thank-you page](https://formy-project.herokuapp.com/thanks).
 
-- There is a time sleep before fullfilling the date field to allow the user to see the progress.
-- The URL changes  
-- A confirmation message is displayed  
+-----
 
-If the automation runs successfully, the form submission will be confirmed, and you will be redirected to [the confirmation page](https://formy-project.herokuapp.com/thanks).
+### 🌟 Key Features
 
----
+  * **Parallel Testing:** Automation script runs concurrently on both **Chrome** and **Firefox** nodes via Selenium Grid.
+  * **Containerized Environment:** Uses Docker and `docker-compose.yml` for easy setup and isolation of the Selenium Hub and browser nodes.
+  * **Visual Debugging (VNC):** Monitor the automation in real-time by connecting to the browser nodes using a VNC viewer.
+  * **Robust Verification:** Utilizes `WebDriverWait` and `expected_conditions` to ensure the final success message is correctly displayed.
 
-## Requirements
+-----
 
-- VNC viewer (TigthVNC Viewer)
-- [Docker](https://www.docker.com/)  
-- [Docker Compose](https://docs.docker.com/compose/) (optional)  
-- Python 3.14+
+### 📋 Prerequisites
 
----
+Ensure you have the following tools installed and configured:
 
-## Setting Up Selenium Grid
+  * **[Docker](https://www.docker.com/):** For building and running containerized applications.
+  * **[Docker Compose](https://docs.docker.com/compose/):** (Recommended) For managing the multi-container Selenium Grid setup.
+  * **Python 3.14+:** To run the automation script.
+  * **VNC Viewer:** ([TightVNC Viewer](https://www.tightvnc.com/download.php) recommended) For viewing the browser sessions graphically.
 
-Start by running the Selenium Hub and nodes:
+-----
 
-```bash
-# Start Selenium Hub
+### ⚙️ Setup and Execution
+
+You have two primary ways to set up the Selenium Grid: using Docker Compose (Recommended) or running individual Docker commands.
+
+#### 1\. Quick Setup with Docker Compose (Recommended)
+
+This method uses the provided `docker-compose.yml` to set up the entire Selenium Grid network (Hub, Chrome Node, Firefox Node) with a single command.
+
+
+# Start the Selenium Grid Hub and Nodes in detached mode
+docker-compose up -d
+
+#### 2\. Manual Setup with Docker Commands
+
+If you prefer to run the containers manually:
+
+
+# 1. Start Selenium Hub
 docker run -d -p 4444:4444 --name selenium-hub selenium/hub:4.13.0
 
-# Start Chrome Node
-docker run -d --name chrome-node --link selenium-hub:hub selenium/node-chrome:4.13.0
+# 2. Start Chrome Node (linking to the hub)
+docker run -d --name chrome-node --link selenium-hub:hub -p 5902:5900 selenium/node-chrome:4.13.0
 
-# Start Firefox Node
-docker run -d --name firefox-node --link selenium-hub:hub selenium/node-firefox:4.13.0
-```
+# 3. Start Firefox Node (linking to the hub)
+docker run -d --name firefox-node --link selenium-hub:hub -p 5901:5900 selenium/node-firefox:4.13.0
+
+-----
+
+### 🏃 Running the Automation Script
+
+After the Selenium Grid is running, build the custom runner image and execute the script:
 
 
-## Using VNC Viewer
+# 1. Build the Python runner image using the provided dockerfile
+docker build -t form-automation-runner .
 
-1. Download and install [TightVNC Viewer](https://www.tightvnc.com/download.php).  
-2. Launch the application (`TightVNC Viewer`).  
-3. When prompted for the server, enter the address and port of the Selenium node:  
-   - **Chrome Node:** `localhost:5901`  
-   - **Firefox Node:** `localhost:5902`  
-   *(These are the default ports if you didn’t change them.)*  
-4. Click **Connect**. The VNC Viewer will display the browser running inside the Selenium node.  
-5. Make sure your Selenium Hub and nodes are running before connecting.
+# 2. Run the automation script container
+# Ensure the container can communicate with the selenium-hub on localhost:4444
+docker run --network host form-automation-runner
 
-> **Tip:** You can open multiple VNC Viewer windows to watch different browser nodes simultaneously.
+-----
+
+### 🖥️ Viewing the Browser with VNC
+
+To visually observe the automation filling out the form, connect a VNC Viewer to the running node containers:
+
+1.  Open your VNC Viewer application (e.g., TightVNC Viewer).
+2.  Connect to the following addresses:
+      * **Chrome Node:** `localhost:5902`
+      * **Firefox Node:** `localhost:5901`
+
+> **💡 Note:** The VNC ports (`5901` and `5902`) are mapped in the `docker-compose.yml` file. You can open multiple VNC windows to watch both browsers simultaneously\!
+
+-----
+
+Would you like me to analyze any specific part of the code or configuration next?
